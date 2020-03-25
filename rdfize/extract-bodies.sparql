@@ -1,4 +1,6 @@
 PREFIX cord: <http://cord19.aksw.org/resource/>
+PREFIX nif: <http://persistence.uni-leipzig.org/nlp2rdf/ontologies/nif-core#>
+PREFIX its: <http://www.w3.org/2005/11/its/rdf#>
 
 INSERT {
   GRAPH ?g {
@@ -32,61 +34,33 @@ WHERE
 INSERT {
   GRAPH ?g {
     ?body
-      eg:citeSpan ?s ;
+      eg:annotation ?s ;
       .
 
     ?s
-      eg:start ?start ;
-      eg:end   ?end ;
-      eg:text  ?text ;
-      eg:refId ?refId ;
+      a eg:Annotation ;
+      its:taClassRef ?annotationType ;
+      nif:beginIndex ?start ;
+      nif:endIndex   ?end ;
+      nif:anchorOf   ?text ;
+      eg:refId       ?refId ;
       .
   }
 }
 WHERE
 {
   GRAPH ?g { ?body eg:bodyJson ?json }
-  BIND(json:path(?json, "$.cite_spans") AS ?list)
+  VALUES (?jsonPath ?annotationType) { ("$.cite_spans" eg:CiteSpan) ( "$.ref_spans" eg:RefSpan ) }
+  BIND(json:path(?json, ?jsonPath) AS ?list)
   ?list json:unnest (?item ?i)
 
-  BIND(json:path(?item, "$.start") AS ?start)
-  BIND(json:path(?item, "$.end") AS ?end)
+  BIND(xsd:long(json:path(?item, "$.start")) AS ?start)
+  BIND(xsd:long(json:path(?item, "$.end")) AS ?end)
   BIND(json:path(?item, "$.text") AS ?text)
   BIND(json:path(?item, "$.ref_id") AS ?refId)
 
-  BIND(IRI(CONCAT(STR(?body), '_citespan-', STR(xsd:long(?start)), '-', STR(xsd:long(?end)))) AS ?s)
+  BIND(IRI(CONCAT(STR(?body), '#char', STR(?start), ',', STR(?end))) AS ?s)
 }
-
-
-# ref spans
-INSERT {
-  GRAPH ?g {
-    ?body
-      eg:refSpan ?s ;
-      .
-
-    ?s
-      eg:start ?start ;
-      eg:end   ?end ;
-      eg:text  ?text ;
-      eg:refId ?refId ;
-      .
-  }
-}
-WHERE
-{
-  GRAPH ?g { ?body eg:bodyJson ?json }
-  BIND(json:path(?json, "$.ref_spans") AS ?list)
-  ?list json:unnest (?item ?i)
-  
-  BIND(json:path(?item, "$.start") AS ?start)
-  BIND(json:path(?item, "$.end") AS ?end)
-  BIND(json:path(?item, "$.text") AS ?text)
-  BIND(json:path(?item, "$.ref_id") AS ?refId)
-  
-  BIND(IRI(CONCAT(STR(?body), '_refspan-', STR(xsd:long(?start)), '-', STR(xsd:long(?end)))) AS ?s)
-}
-
 
 
 
