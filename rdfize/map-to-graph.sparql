@@ -1,3 +1,5 @@
+PREFIX cord19: <http://cord19.aksw.org/resource/>
+
 CONSTRUCT {
   GRAPH ?s {
     ?s
@@ -15,6 +17,6 @@ WHERE {
   ?file url:text ?str .
   BIND(STRDT(?str, xsd:json) AS ?json)
   BIND(json:path(?json, "$.paper_id") AS ?paperId)
-  BIND(IRI(CONCAT("http://covid19.aksw.org/", ?paperId)) AS ?s)
+  BIND(IRI(CONCAT(STR(cord19:), 'document-', ?paperId)) AS ?s)
 }
 
