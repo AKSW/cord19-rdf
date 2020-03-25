@@ -1,6 +1,6 @@
 # cord19-rdf
 
-[alt text](screenshot.png "Logo Title Text 1")
+![alt text](screenshot.png "Logo Title Text 1")
 
 ```
 cd target
