@@ -1,0 +1,102 @@
+PREFIX covid: <http://covid19.aksw.org/>
+
+INSERT {
+  GRAPH ?g {
+    ?s eg:hasText ?a .
+
+    ?a
+      eg:text ?text ;
+      eg:section ?section ;
+      eg:textHash ?textHash ;
+      eg:bodyJson ?item ;
+      .
+  }
+}
+WHERE
+{
+  GRAPH ?g { ?s eg:json ?json }
+  VALUES ?jsonKey { "$.abstract" "$.body_text" }
+  BIND(json:path(?json, ?jsonKey) AS ?list)
+  ?list json:unnest (?item ?i)
+
+  BIND(json:path(?item, "$.text") AS ?text)
+  BIND(SHA256(?text) AS ?textHash)
+
+  BIND(json:path(?item, "$.section") AS ?section)
+  BIND(IRI(CONCAT(STR(covid:), 'text-', ?textHash)) AS ?a)
+}
+
+
+
+# cite spans
+INSERT {
+  GRAPH ?g {
+    ?body
+      eg:citeSpan ?s ;
+      .
+
+    ?s
+      eg:start ?start ;
+      eg:end   ?end ;
+      eg:text  ?text ;
+      eg:refId ?refId ;
+      .
+  }
+}
+WHERE
+{
+  GRAPH ?g { ?body eg:bodyJson ?json }
+  BIND(json:path(?json, "$.cite_spans") AS ?list)
+  ?list json:unnest (?item ?i)
+
+  BIND(json:path(?item, "$.start") AS ?start)
+  BIND(json:path(?item, "$.end") AS ?end)
+  BIND(json:path(?item, "$.text") AS ?text)
+  BIND(json:path(?item, "$.ref_id") AS ?refId)
+
+  BIND(IRI(CONCAT(STR(?body), '_citespan-', STR(xsd:long(?start)), '-', STR(xsd:long(?end)))) AS ?s)
+}
+
+
+# ref spans
+INSERT {
+  GRAPH ?g {
+    ?body
+      eg:refSpan ?s ;
+      .
+
+    ?s
+      eg:start ?start ;
+      eg:end   ?end ;
+      eg:text  ?text ;
+      eg:refId ?refId ;
+      .
+  }
+}
+WHERE
+{
+  GRAPH ?g { ?body eg:bodyJson ?json }
+  BIND(json:path(?json, "$.ref_spans") AS ?list)
+  ?list json:unnest (?item ?i)
+  
+  BIND(json:path(?item, "$.start") AS ?start)
+  BIND(json:path(?item, "$.end") AS ?end)
+  BIND(json:path(?item, "$.text") AS ?text)
+  BIND(json:path(?item, "$.ref_id") AS ?refId)
+  
+  BIND(IRI(CONCAT(STR(?body), '_refspan-', STR(xsd:long(?start)), '-', STR(xsd:long(?end)))) AS ?s)
+}
+
+
+
+
+
+
+
+
+
+#DELETE { GRAPH ?g { ?s eg:bodyJson ?o } } WHERE { GRAPH ?g { ?s eg:bodyJson ?o } }
+DELETE { GRAPH ?g { ?s eg:json ?o } } WHERE { GRAPH ?g { ?s eg:json ?o } }
+
+CONSTRUCT WHERE { GRAPH ?g { ?s ?p ?o } }
+

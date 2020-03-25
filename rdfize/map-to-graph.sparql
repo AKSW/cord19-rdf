@@ -1,0 +1,20 @@
+CONSTRUCT {
+  GRAPH ?s {
+    ?s
+      a dct:BibliographicResource ;
+      dct:identifier ?paperId ;
+      eg:json ?json
+  }
+}
+WHERE {
+  { SELECT ?file {
+    <> fs:find ?file .
+    FILTER(STRENDS(STR(?file), '.json'))
+  } LIMIT 10 }
+
+  ?file url:text ?str .
+  BIND(STRDT(?str, xsd:json) AS ?json)
+  BIND(json:path(?json, "$.paper_id") AS ?paperId)
+  BIND(IRI(CONCAT("http://covid19.aksw.org/", ?paperId)) AS ?s)
+}
+

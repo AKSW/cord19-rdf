@@ -1,0 +1,49 @@
+PREFIX covid: <http://covid19.aksw.org/>
+
+CONSTRUCT {
+  GRAPH ?g {
+    ?s
+      rdfs:label ?title ;
+      .
+  }
+}
+{
+  GRAPH ?g { ?s eg:json ?json }
+
+  BIND(json:path(?json, "$.metadata.title") AS ?title)
+}
+
+
+
+CONSTRUCT {
+  GRAPH ?g {
+    ?s dct:author ?a .
+
+    ?a
+      foaf:firstName ?fn ;
+      foaf:lastName ?ln ;
+      foaf:middleName ?mn ;
+      foaf:mbox ?mbox ;
+      .
+
+  }
+}
+{
+  GRAPH ?g { ?s ?p ?o ; eg:json ?json }
+
+  BIND(json:path(?json, "$.metadata.authors") AS ?authorList)
+  ?authorList json:unnest (?item ?i)
+  BIND(json:path(?item, "$.first") AS ?fn)
+  # BIND(json:path(?item, "$.middle") AS ?mn)
+  BIND("-todo-middle-name" AS ?mn)
+  BIND(json:path(?item, "$.last") AS ?ln)
+  BIND(json:path(?item, "$.email") AS ?mbox)
+
+  BIND(IF(BOUND(?mbox) && !REGEX(?mbox, "\\s*"), ENCODE_FOR_URI(?mbox), CONCAT(STR(?fn), STR(?mn), STR(?ln))) AS ?authorId)
+  BIND(IRI(CONCAT(STR(covid:), ?authorId)) AS ?a)
+}
+
+
+
+
+

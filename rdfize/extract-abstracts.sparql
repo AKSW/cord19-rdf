@@ -1,0 +1,23 @@
+PREFIX covid: <http://covid19.aksw.org/>
+
+CONSTRUCT {
+  GRAPH ?g {
+    ?s eg:abstracts ?a .
+
+    ?a eg:text ?text .
+
+  }
+}
+{
+  GRAPH ?g { ?s eg:json ?json }
+
+  BIND(json:path(?json, "$.abstract") AS ?abstractList)
+  ?abstractList json:unnest (?item ?i)
+
+  BIND(json:path(?item, "$.text") AS ?text)
+  BIND(SHA256(?text) AS ?textHash)
+
+  BIND(IRI(CONCAT(STR(covid:), 'text-', ?textHash)) AS ?a)
+}
+
+
