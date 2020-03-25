@@ -1,11 +1,11 @@
-PREFIX covid: <http://covid19.aksw.org/>
+PREFIX cord: <http://cord19.aksw.org/resource/>
 
 INSERT {
   GRAPH ?g {
     ?s eg:hasText ?a .
 
     ?a
-      eg:text ?text ;
+      rdfs:label ?text ;
       eg:section ?section ;
       eg:textHash ?textHash ;
       eg:bodyJson ?item ;
@@ -23,7 +23,7 @@ WHERE
   BIND(SHA256(?text) AS ?textHash)
 
   BIND(json:path(?item, "$.section") AS ?section)
-  BIND(IRI(CONCAT(STR(covid:), 'text-', ?textHash)) AS ?a)
+  BIND(IRI(CONCAT(STR(cord:), 'text-', ?textHash)) AS ?a)
 }
 
 
@@ -95,7 +95,7 @@ WHERE
 
 
 
-#DELETE { GRAPH ?g { ?s eg:bodyJson ?o } } WHERE { GRAPH ?g { ?s eg:bodyJson ?o } }
+DELETE { GRAPH ?g { ?s eg:bodyJson ?o } } WHERE { GRAPH ?g { ?s eg:bodyJson ?o } }
 DELETE { GRAPH ?g { ?s eg:json ?o } } WHERE { GRAPH ?g { ?s eg:json ?o } }
 
 CONSTRUCT WHERE { GRAPH ?g { ?s ?p ?o } }
