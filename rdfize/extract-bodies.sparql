@@ -57,7 +57,7 @@ WHERE
   BIND(xsd:long(json:path(?item, "$.start")) AS ?start)
   BIND(xsd:long(json:path(?item, "$.end")) AS ?end)
   BIND(json:path(?item, "$.text") AS ?text)
-  BIND(json:path(?item, "$.ref_id") AS ?refId)
+#  BIND(json:path(?item, "$.ref_id") AS ?refId)
 
   BIND(IRI(CONCAT(STR(?body), '#char', STR(?start), ',', STR(?end))) AS ?s)
 }

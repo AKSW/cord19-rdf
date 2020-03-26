@@ -9,14 +9,17 @@ CONSTRUCT {
   }
 }
 WHERE {
-  { SELECT ?file {
+#  { SELECT ?file {
     <> fs:find ?file .
     FILTER(STRENDS(STR(?file), '.json'))
-  } LIMIT 10 }
+#  } }
+#  } LIMIT 10 }
 
-  ?file url:text ?str .
+#  ?file url:text ?str .
+  BIND(url:text(?file) AS ?str)
   BIND(STRDT(?str, xsd:json) AS ?json)
   BIND(json:path(?json, "$.paper_id") AS ?paperId)
   BIND(IRI(CONCAT(STR(cord19:), 'document-', ?paperId)) AS ?s)
 }
+# ORDER BY ?s
 
