@@ -70,7 +70,7 @@ WHERE
 
 
 DELETE { GRAPH ?g { ?s eg:bodyJson ?o } } WHERE { GRAPH ?g { ?s eg:bodyJson ?o } }
-DELETE { GRAPH ?g { ?s eg:json ?o } } WHERE { GRAPH ?g { ?s eg:json ?o } }
+# DELETE { GRAPH ?g { ?s eg:json ?o } } WHERE { GRAPH ?g { ?s eg:json ?o } }
 
-CONSTRUCT WHERE { GRAPH ?g { ?s ?p ?o } }
+# CONSTRUCT WHERE { GRAPH ?g { ?s ?p ?o } }
 
