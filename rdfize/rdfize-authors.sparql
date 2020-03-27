@@ -1,4 +1,4 @@
-PREFIX covid: <http://covid19.aksw.org/>
+PREFIX covid: <http://covid19.aksw.org/resource/>
 
 
 # Create resources for the cited documents:
@@ -86,6 +86,54 @@ WHERE
 
   BIND(IRI(CONCAT(STR(?s) , '-authors')) AS ?al)
   BIND(IRI(CONCAT(STR(rdf:), '_', STR(?i + 1))) AS ?member)
+}
+
+
+# Add some known mappings
+#INSERT DATA {
+#  eg:institution eg:predicateLabel "institution" .
+#  eg:Institution eg:classLabel "institution" .
+#
+#}
+
+INSERT {
+  GRAPH ?g {
+    ?s
+      eg:affiliation ?a ;
+      .
+
+    ?a
+      eg:laboratory ?lab ;
+      eg:institution ?ins ;
+      eg:location ?l ;
+     .
+
+    ?l
+      eg:addrLine ?loc_addr ;
+      eg:postCode ?loc_post ;
+      eg:settlemenet ?loc_sett ;
+      eg:country ?loc_coun ;
+      .
+  }  
+}
+WHERE
+{
+  GRAPH ?g { ?s eg:affiliationJson ?json }
+  BIND(json:path(?json, '$.laboratory') AS ?lab)
+  BIND(json:path(?json, '$.institution') AS ?ins)
+
+  BIND(REPLACE(CONCAT(COALESCE(?ins, ""), "-", COALESCE(?lab, "")), "(^-+)|-+$", "") AS ?affId)
+
+  BIND(json:path(?json, '$.location.addrLine') AS ?loc_addr)
+  BIND(json:path(?json, '$.location.postCode') AS ?loc_post)
+  BIND(json:path(?json, '$.location.settlement') AS ?loc_sett)
+  BIND(json:path(?json, '$.location.country') AS ?loc_coun)
+  BIND(REPLACE(CONCAT(COALESCE(?loc_addr, ""), "-", COALESCE(?loc_post, ""), "-", COALESCE(?loc_sett, ""), "-", COALESCE(?loc_coun, "")), "(^-+)|-+$", "") AS ?tmpLocId)
+
+  BIND(IF(?tmpLocId = "", 1 < 'a', ?tmpLocId) AS ?locId)
+
+  BIND(IRI(CONCAT(STR(covid:), "affiliation-", ENCODE_FOR_URI(?affId), "-", ENCODE_FOR_URI(?locId))) AS ?a)
+  BIND(IRI(CONCAT(STR(covid:), "location-", ENCODE_FOR_URI(?locId))) AS ?l)
 }
 
 
