@@ -1,0 +1,55 @@
+#!/bin/bash
+source index-env
+> keywords.ttl
+for file in $FILES; do
+	cat $file | jq -c '.' | while IFS= read -r jsonPart; do 
+		export PAPER_ID=`echo $jsonPart | jq -r '.paper_id'`
+        title=`echo $jsonPart | jq '.metadata.title'`
+		TITLE_HASH=$(echo "$title" | md5sum | cut -d' ' -f1)
+		export TITLE_HASH
+		sparql-integrate --w=trig/pretty --io=keywords.ttl prefixes.ttl queries/insert-paper.sparql spo.sparql
+        #spotlightJSON=`curl -X GET -G $spotlightAPI --data-urlencode 'text="'"$title"'"' --data-urlencode "confidence=$confidence" --data-urlencode "policy=blacklist" --data-urlencode 'types="'"$type_list"'"' -H  "accept: application/json"`
+		spotlightJSON=`curl -X GET -G $spotlightAPI --data-urlencode 'text="'"$title"'"' --data-urlencode "confidence=$confidence" -H  "accept: application/json"`
+		totalLength=`echo $spotlightJSON | jq -r '.Resources | length'`
+  		length=$(($totalLength-1))
+  		resultList=`echo "{ \"uris\" : [] }"` 
+        listofdbpedia=()
+  		for i in `seq 0 $length`; do
+			dbpediaURL=`echo $spotlightJSON | jq -r '.Resources['$i']."@URI"'`
+			dbpediaText=`echo $spotlightJSON | jq -r '.Resources['$i']."@surfaceForm"' | tr '[:upper:]' '[:lower:]'` 
+			unique=1
+			for j in "${listofdbpedia[@]}"; do  
+				if [ "$dbpediaURL" == "$j" ]; then 
+					unique=0
+					break; 
+				fi
+			done
+			if [ $unique = 1 ] ; then 
+				export dbpediaText
+				tmp=${title%%$dbpediaText*}
+				beginIndex=`echo ${#tmp}`
+				export beginIndex
+				charLength=${#dbpediaText}
+				export endIndex=$(( beginIndex + charLength ))
+				export KEYWORD="$dbpediaURL"
+				sparql-integrate --w=trig/pretty --io=keywords.ttl prefixes.ttl queries/insert-keyword.sparql spo.sparql
+				#wikidataURL=`curl -X GET -G "$lookupAPI=$dbpediaURL" | jq -r '.locals[0]' ` 
+				#export KEYWORD="$wikidataURL"
+				#echo $wikidataURL
+				#sparql-integrate --w=trig/pretty --io=keywords.ttl prefixes.ttl queries/insert-keyword.sparql spo.sparql
+				#sed -e "s#\$MAPPING#$wikidataURL#" queries/mapping-wd.sparql > tmp-mapping.sparql
+                #queryText=`cat tmp-mapping.sparql`
+			    #results=`curl  -G $wikidataAPI --data-urlencode query="$queryText" -H "Accept: application/sparql-results+json" | jq '.results'`
+				#echo $results | jq -c '.[][]' | while IFS= read -r result; do 
+				#    meshDescriptor=`echo $result | jq -r '.meshDesc.value'`
+				#	if [ "$meshDescriptor" != "null" ]; then
+				#		export KEYWORD="$meshDescriptor"
+				#		echo $meshDescriptor
+				#		sparql-integrate --w=trig/pretty --io=keywords.ttl prefixes.ttl queries/insert-keyword.sparql spo.sparql
+				#	fi
+				#done
+			fi
+		done
+	done 
+done
+

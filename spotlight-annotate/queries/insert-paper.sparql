@@ -1,0 +1,20 @@
+INSERT 
+
+{ 
+
+?paper a eg:Document;
+	   dct:identifier ?id;
+	   eg:title ?titleURI .
+	   
+
+}
+
+WHERE { 
+		
+	BIND(sys:getenv('PAPER_ID') as ?id) 
+	BIND(sys:getenv('TITLE_HASH') as ?hash) 
+	BIND('http://cord19.aksw.org/resource/document-' AS ?paperNS)
+	BIND('http://cord19.aksw.org/resource/title-' AS ?titleNS)		
+	BIND(IRI(CONCAT(?paperNS,?id)) as ?paper) 
+	BIND(IRI(CONCAT(?titleNS,?hash)) as ?titleURI) 
+}
