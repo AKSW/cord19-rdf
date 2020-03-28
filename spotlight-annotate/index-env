@@ -1,0 +1,11 @@
+#!/bin/bash
+spotlightAPI="http://api.dbpedia-spotlight.org/de/annotate"
+#spotlightAPI="http://0.0.0.0:2222/rest/annotate"
+TARGET_DIR="../target"
+TARGET_FILE="$TARGET_DIR/keywords.ttl"
+FILES="$TARGET_DIR/biorxiv_medrxiv/*"
+confidence=0.6
+type_list="Award,MusicGenre,OlympicResult,SnookerWorldRanking,Film,Musical,MusicalWork,TelevisionEpisode,TelevisionShow"
+dbpediaAPI="http://dbpedia.org/sparql"
+lookupAPI="https://global.dbpedia.org/same-thing/lookup/?uri"
+wikidataAPI="https://query.wikidata.org/sparql"
