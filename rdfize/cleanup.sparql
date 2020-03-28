@@ -1,0 +1,3 @@
+
+DELETE { GRAPH ?g { ?s eg:json ?o } } WHERE { GRAPH ?g { ?s eg:json ?o } }
+
