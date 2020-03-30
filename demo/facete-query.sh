@@ -10,7 +10,7 @@ BASE=`curl -G "http://cord19.aksw.org/nli" --data-urlencode "query=$QUERY" --dat
 
 echo "Created base concept: $BASE"
 
-echo "$BASE" > /tmp/tmp.sparql
+# echo "$BASE" > /tmp/tmp.sparql
 
 java -cp target/facete3.jar facete3 -c "$BASE" http://cord19.aksw.org/sparql
 
