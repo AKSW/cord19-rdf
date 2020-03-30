@@ -96,6 +96,12 @@ WHERE
 #
 #}
 
+
+# TODO We should just add a json:rdfize method: ?json json:rdfize(<base://predicate.url/> ?out_s ?out_p ?out_o)
+# - For every json object create a blank node (for arrays create Seqs - maybe add a config option to allow rdf:List)
+# - Append every key to the base predicate URL
+# - Convert JSON literals to RDF
+# - We can then map known temporary predicates to final ones based on some mapping dataset via INSERT DATA { } 
 INSERT {
   GRAPH ?g {
     ?s
@@ -135,5 +141,10 @@ WHERE
   BIND(IRI(CONCAT(STR(covid:), "affiliation-", ENCODE_FOR_URI(?affId), "-", ENCODE_FOR_URI(?locId))) AS ?a)
   BIND(IRI(CONCAT(STR(covid:), "location-", ENCODE_FOR_URI(?locId))) AS ?l)
 }
+
+
+# Clean up intermediate data
+DELETE { GRAPH ?g { ?s eg:affiliationJson ?o } } WHERE { GRAPH ?g { ?s eg:affiliationJson ?o } }
+DELETE { GRAPH ?g { ?s eg:authorJson ?o } } WHERE { GRAPH ?g { ?s eg:authorJson ?o } }
 
 

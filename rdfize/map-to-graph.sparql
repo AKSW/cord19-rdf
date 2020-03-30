@@ -4,22 +4,21 @@ CONSTRUCT {
   GRAPH ?s {
     ?s
       a dct:BibliographicResource ;
+      rdfs:label ?label ;
       dct:identifier ?paperId ;
       eg:json ?json
   }
 }
 WHERE {
-#  { SELECT ?file {
-    <> fs:find ?file .
-    FILTER(STRENDS(STR(?file), '.json'))
-#  } }
-#  } LIMIT 10 }
+  <> fs:find ?file .
+  FILTER(STRENDS(STR(?file), '.json'))
 
-#  ?file url:text ?str .
   BIND(url:text(?file) AS ?str)
   BIND(STRDT(?str, xsd:json) AS ?json)
   BIND(json:path(?json, "$.paper_id") AS ?paperId)
+  BIND(json:path(?json, "$.metadata.title") AS ?label)
   BIND(IRI(CONCAT(STR(cord19:), 'document-', ?paperId)) AS ?s)
+  
 }
 # ORDER BY ?s
 
