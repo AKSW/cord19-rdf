@@ -1,0 +1,27 @@
+INSERT 
+
+{ 
+
+?annotationURI a nif:Phrase;
+		 nif:anchorOf ?text;
+		 nif:beginIndex ?beginIndex;
+		 nif:endIndex ?endIndex;
+		 nif:referenceContext ?titleURI; 
+		 its:taIdentRef ?subject.
+}
+
+WHERE { 
+	
+    ?paper dct:identifier ?id ;
+			eg:title ?titleURI .
+	BIND(IRI(sys:getenv('KEYWORD')) as ?subject) 
+	BIND(sys:getenv('dbpediaText') as ?text)
+	BIND(STRDT(sys:getenv('beginIndex'), xsd:nonNegativeInteger) as ?beginIndex)
+    BIND(STRDT(sys:getenv('endIndex'), xsd:nonNegativeInteger) as ?endIndex)
+	BIND(IRI(CONCAT(str(?titleURI),'#char',sys:getenv('beginIndex'),',',sys:getenv('endIndex'))) as ?annotationURI)
+	FILTER (?id = sys:getenv('PAPER_ID')) 
+
+}
+
+
+

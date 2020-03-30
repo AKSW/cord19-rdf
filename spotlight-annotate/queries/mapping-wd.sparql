@@ -1,0 +1,15 @@
+PREFIX wdtn: <http://www.wikidata.org/prop/direct-normalized/>
+PREFIX bd: <http://www.bigdata.com/rdf#> 
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> 
+PREFIX wikibase: <http://wikiba.se/ontology#> 
+SELECT DISTINCT ?subject ?subjectLabel ?meshCode ?meshDesc ?meshCon WHERE 
+{ 
+  VALUES ?subject { <$MAPPING> }
+  SERVICE wikibase:label {
+     bd:serviceParam wikibase:language "en" .
+   }
+  OPTIONAL { ?subject wdtn:P672 ?meshCode }
+  OPTIONAL { ?subject wdtn:P486 ?meshDesc }
+  OPTIONAL { ?subject wdtn:P6694 ?meshCon }
+
+}
