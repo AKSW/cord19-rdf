@@ -1,7 +1,7 @@
 #!/bin/bash
 
-QUERY=$1
-LIMIT=${2:-100}
+QUERY="$1"
+LIMIT="${2:-100}"
 
 mkdir -p target
 wget -O target/facete3.jar -c 'https://github.com/hobbit-project/facete3/releases/download/facete3-bundle-1.2.0-SNAPSHOT/facete3-bundle-1.2.0-SNAPSHOT-jar-with-dependencies.jar'
